@@ -960,4 +960,114 @@ print(f"실제잔류   {conf_matrix[0][0]}       {conf_matrix[0][1]}")
 print(f"실제이탈   {conf_matrix[1][0]}       {conf_matrix[1][1]}")
 print(f"\\nQ2. True Positive: {conf_matrix[1][1]}")
 print(f"Q3. False Negative: {conf_matrix[1][0]}")`,
+
+  'f-test-variance': `"""
+[문제]
+당뇨병 환자를 두 그룹(치료군 A, B)으로 나누어 로그 리지스틴 수치를 측정하였다.
+두 집단의 분산에 차이가 있는지 F-검정을 수행하시오.
+
+Q1. F-검정 통계량을 소수점 3자리까지 구하시오.
+    (단, 분자의 자유도가 분모의 자유도보다 크도록 할 것)
+Q2. 분자의 자유도를 구하시오.
+Q3. 분모의 자유도를 구하시오.
+"""
+
+import pandas as pd
+import numpy as np
+from scipy import stats
+
+# 데이터셋
+df = pd.DataFrame({
+    '환자ID': [f'P{i:02d}' for i in range(1, 41)],
+    '치료군': ['A']*20 + ['B']*20,
+    '로그리지스틴': [2.45, 3.12, 2.89, 3.45, 2.67, 3.21, 2.98, 3.56, 2.34, 3.78,
+                     2.91, 3.34, 2.76, 3.15, 2.88, 3.42, 2.65, 3.28, 2.93, 3.51,
+                     4.12, 3.89, 4.56, 3.78, 4.34, 3.95, 4.21, 3.67, 4.45, 3.82,
+                     4.08, 3.91, 4.38, 3.72, 4.15, 3.88, 4.28, 3.98, 4.42, 3.85]
+})
+
+# 집단 분리
+치료군A = df[df['치료군'] == 'A']['로그리지스틴']
+치료군B = df[df['치료군'] == 'B']['로그리지스틴']
+
+# 분산 계산 (ddof=1: 표본분산)
+var_A = 치료군A.var(ddof=1)
+var_B = 치료군B.var(ddof=1)
+n1, n2 = len(치료군A), len(치료군B)
+
+print(f"치료군 A: n={n1}, 분산={var_A:.4f}")
+print(f"치료군 B: n={n2}, 분산={var_B:.4f}")
+
+# F-검정 통계량 (분자 자유도 > 분모 자유도)
+if var_A > var_B:
+    F_stat = var_A / var_B
+    dfn = n1 - 1  # 분자 자유도
+    dfd = n2 - 1  # 분모 자유도
+else:
+    F_stat = var_B / var_A
+    dfn = n2 - 1
+    dfd = n1 - 1
+
+print(f"\\nQ1. F 통계량: {F_stat:.3f}")
+print(f"Q2. 분자 자유도: {dfn}")
+print(f"Q3. 분모 자유도: {dfd}")
+
+# 추가: p-value (양측검정)
+p_value = 2 * (1 - stats.f.cdf(F_stat, dfn, dfd))
+print(f"\\np-value: {p_value:.4f}")
+if p_value > 0.05:
+    print("등분산성 만족 (p > 0.05)")
+else:
+    print("등분산성 불만족 (p <= 0.05)")`,
+
+  'pooled-variance': `"""
+[문제]
+두 집단의 로그 리지스틴 값에 대한 합동분산추정량을 구하시오.
+(등분산 가정 하에 두 집단의 공통 분산 추정)
+
+Q1. 집단 A의 표본분산을 소수점 4자리까지 구하시오.
+Q2. 집단 B의 표본분산을 소수점 4자리까지 구하시오.
+Q3. 합동분산추정량을 소수점 3자리까지 구하시오.
+"""
+
+import pandas as pd
+import numpy as np
+
+# 데이터셋
+df = pd.DataFrame({
+    '환자ID': [f'P{i:02d}' for i in range(1, 41)],
+    '집단': ['A']*20 + ['B']*20,
+    '로그리지스틴': [2.45, 3.12, 2.89, 3.45, 2.67, 3.21, 2.98, 3.56, 2.34, 3.78,
+                     2.91, 3.34, 2.76, 3.15, 2.88, 3.42, 2.65, 3.28, 2.93, 3.51,
+                     4.12, 3.89, 4.56, 3.78, 4.34, 3.95, 4.21, 3.67, 4.45, 3.82,
+                     4.08, 3.91, 4.38, 3.72, 4.15, 3.88, 4.28, 3.98, 4.42, 3.85]
+})
+
+# 집단 분리
+집단A = df[df['집단'] == 'A']['로그리지스틴']
+집단B = df[df['집단'] == 'B']['로그리지스틴']
+
+# 표본분산 계산 (ddof=1)
+n1, n2 = len(집단A), len(집단B)
+var_A = 집단A.var(ddof=1)
+var_B = 집단B.var(ddof=1)
+
+print(f"Q1. 집단 A 표본분산: {var_A:.4f}")
+print(f"Q2. 집단 B 표본분산: {var_B:.4f}")
+
+# 합동분산추정량 (Pooled Variance Estimator)
+# 공식: s²_p = ((n₁-1)s₁² + (n₂-1)s₂²) / (n₁ + n₂ - 2)
+pooled_var = ((n1 - 1) * var_A + (n2 - 1) * var_B) / (n1 + n2 - 2)
+
+print(f"\\nQ3. 합동분산추정량: {pooled_var:.3f}")
+
+# 추가: 합동표준편차
+pooled_std = np.sqrt(pooled_var)
+print(f"합동표준편차: {pooled_std:.3f}")
+
+# 공식 설명
+print(f"\\n--- 계산 과정 ---")
+print(f"s²_p = (({n1}-1)×{var_A:.4f} + ({n2}-1)×{var_B:.4f}) / ({n1}+{n2}-2)")
+print(f"     = ({n1-1}×{var_A:.4f} + {n2-1}×{var_B:.4f}) / {n1+n2-2}")
+print(f"     = {pooled_var:.4f}")`,
 };

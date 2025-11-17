@@ -66,6 +66,28 @@ export const statisticsTree: StatNode = {
                 functionName: 'bartlett()',
               },
             },
+            {
+              id: 'f-test-variance',
+              label: 'F-검정\n(분산비 검정)',
+              type: 'method',
+              metadata: {
+                library: 'scipy.stats',
+                importance: 3,
+                note: '두 집단 분산비 검정',
+                functionName: 'F = var1/var2',
+              },
+            },
+            {
+              id: 'pooled-variance',
+              label: '합동분산추정량',
+              type: 'method',
+              metadata: {
+                library: 'numpy',
+                importance: 2,
+                note: '두 집단 공통 분산 추정',
+                functionName: 's²_p = ((n₁-1)s₁²+(n₂-1)s₂²)/(n₁+n₂-2)',
+              },
+            },
           ],
         },
       ],

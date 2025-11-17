@@ -32,6 +32,10 @@ const promptMapping: Record<string, string> = {
   'pearsonr()': 'improved_prompt_correlation.md',
   'spearmanr()': 'improved_prompt_correlation.md',
   'kendalltau()': 'improved_prompt_correlation.md',
+
+  // F-검정 및 합동분산추정량
+  'F = var1/var2': 'improved_prompt_f_test_pooled_variance.md',
+  's²_p = ((n₁-1)s₁²+(n₂-1)s₂²)/(n₁+n₂-2)': 'improved_prompt_f_test_pooled_variance.md',
 };
 
 function getImprovedPrompt(functionName: string): string | null {
@@ -69,14 +73,52 @@ export async function POST(request: NextRequest) {
 
 ---
 
+# 🚨 중요: 문제 생성 요청
+
 위 프롬프트의 지침을 정확히 따라서, 다음 통계 방법에 대한 예상 문제를 1개 생성해주세요.
-문제, 힌트, 정답 코드를 모두 포함해야 합니다.
 
 메서드명: ${methodName}
 라이브러리: ${library}
 설명: ${note}
 
-반드시 프롬프트에 명시된 형식과 규칙을 준수하세요.
+## ⚠️ 반드시 지켜야 할 출력 형식
+
+생성하는 문제는 **반드시** 다음 구조를 포함해야 합니다:
+
+### 1. 시나리오 (간단히 2-3문장)
+### 2. 데이터 생성 코드 (완전한 리터럴 데이터)
+### 3. ❓ 질문 섹션 (가장 중요! 절대 생략 금지!)
+
+**질문 섹션은 반드시 아래 형식을 따라야 합니다:**
+
+\`\`\`
+## ❓ 질문
+
+**1)** [첫 번째 구체적인 질문]
+- 출력 형식: [소수점 자릿수 등 명시]
+
+**2)** [두 번째 구체적인 질문]
+- 출력 형식: [명시]
+
+**3)** [세 번째 구체적인 질문] (선택)
+- 출력 형식: [명시]
+\`\`\`
+
+### 4. 힌트 (라이브러리, 함수명, 주의사항)
+### 5. 정답 코드 (완전한 Python 코드)
+
+## 🚫 절대 금지사항
+- ❌ 시나리오만 있고 질문이 없는 형태
+- ❌ 줄글 형태로 질문을 서술하는 것
+- ❌ "분석하시오", "검정하시오" 등 모호한 지시
+- ❌ 출력 형식을 명시하지 않는 것
+
+## ✅ 반드시 포함
+- ✅ **1)**, **2)**, **3)** 번호가 매겨진 명확한 질문
+- ✅ 각 질문마다 구체적인 출력 형식 지정
+- ✅ 소수점 자릿수 명시 (예: "소수점 셋째 자리에서 반올림")
+
+지금 바로 위 형식에 맞게 문제를 생성하세요.
 `;
     } else {
       // 기본 프롬프트 사용
