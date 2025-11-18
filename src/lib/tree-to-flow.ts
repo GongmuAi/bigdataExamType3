@@ -27,7 +27,13 @@ export function convertTreeToFlow(tree: StatNode): { nodes: Node[]; edges: Edge[
         target: node.id,
         type: 'smoothstep',
         animated: false,
-        style: { stroke: '#94a3b8', strokeWidth: 2 },
+        style: {
+          stroke: '#94a3b8',
+          strokeWidth: 2.5,
+          strokeOpacity: 0.8,
+        },
+        // 엣지 간격 개선을 위한 pathOptions 추가
+        pathOptions: { offset: 5, borderRadius: 10 },
       });
     }
 
@@ -54,10 +60,10 @@ export function getLayoutedElements(
 
   dagreGraph.setGraph({
     rankdir: direction,
-    nodesep: 100,
-    ranksep: 120,
-    marginx: 30,
-    marginy: 30,
+    nodesep: 200,      // 노드 수직 간격 증가 (100 → 200)
+    ranksep: 250,      // 계층 간 수평 간격 증가 (120 → 250)
+    marginx: 50,
+    marginy: 50,
   });
 
   nodes.forEach((node) => {
@@ -91,7 +97,7 @@ export function getLayoutedElements(
   const maxX = Math.max(...methodNodesWithPositions.map(m => m.x));
 
   // Recalculate Y positions for method nodes to be evenly spaced in a single column
-  const methodNodeSpacing = nodeHeight + 100; // height + vertical gap
+  const methodNodeSpacing = nodeHeight + 180; // height + vertical gap (100 → 180)
   const startY = methodNodesWithPositions.length > 0 ? methodNodesWithPositions[0].originalY : 0;
 
   const layoutedMethodNodes = methodNodesWithPositions.map((item, index) => ({

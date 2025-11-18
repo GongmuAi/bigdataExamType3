@@ -64,8 +64,9 @@ const StatMethodNode = ({ data, id }: NodeProps) => {
     let dataCode = '';
     let solution = '';
 
-    // Extract problem section (everything before first code block or "데이터 생성")
-    const problemMatch = text.match(/^([\s\S]*?)(?=```python|## 데이터|### 데이터)/i);
+    // Extract problem section (from beginning up to but not including "## 힌트" or "## 정답")
+    // This includes: title, scenario, data code section, and question section
+    const problemMatch = text.match(/^([\s\S]*?)(?=## 힌트|## 정답)/i);
     if (problemMatch) {
       problem = problemMatch[1].trim();
     }
@@ -100,10 +101,10 @@ const StatMethodNode = ({ data, id }: NodeProps) => {
       }
     }
 
-    // If still no problem text, use everything before first code block
+    // If still no problem text, use everything before "## 힌트" or "## 정답"
     if (!problem) {
-      const beforeCode = text.split('```')[0];
-      problem = beforeCode.trim();
+      const beforeHint = text.split(/## 힌트|## 정답/i)[0];
+      problem = beforeHint.trim();
     }
 
     return { problem, dataCode, solution };
@@ -271,7 +272,7 @@ const StatMethodNode = ({ data, id }: NodeProps) => {
                 ) : (
                   <>
                     <Sparkles className="h-5 w-5 mr-2" />
-                    예상문제 생성
+                    {practiceQuestion ? '새 문제 생성' : '예상문제 생성'}
                   </>
                 )}
               </Button>

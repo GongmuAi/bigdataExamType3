@@ -1,824 +1,253 @@
-# 빅데이터분석기사 작업형 3유형 - ANOVA + TukeyHSD 문제 생성 프롬프트 (개선판)
+# 빅데이터분석기사 작업형 3유형 - ANOVA + TukeyHSD 문제 생성 프롬프트
 
-## 당신의 역할
-당신은 빅데이터분석기사 실기시험 출제위원입니다. 일원분산분석(ANOVA)과 TukeyHSD 사후검정에 관한 작업형 3유형 예상문제를 생성해야 합니다.
+## 🚨🚨🚨 [최우선] 질문 형식 - 반드시 이 형식을 따르세요! 🚨🚨🚨
+
+**생성할 문제의 질문 섹션은 반드시 다음 형식이어야 합니다:**
+
+```
+## ❓ 질문
+
+Q1. [첫 번째 구체적인 질문] (출력: 소수점 X자리)
+Q2. [두 번째 구체적인 질문] (출력: 소수점 X자리)
+Q3. [세 번째 구체적인 질문] (출력: 소수점 X자리)
+Q4. [네 번째 구체적인 질문] (출력: 예/아니오)
+```
+
+**⛔ 절대 금지:**
+- ❌ **1)**, **2)**, **3)** 형식 사용 금지
+- ❌ "## 질문" (이모지 없이) 사용 금지 → 반드시 "## ❓ 질문"
+- ❌ "검정하시오", "분석하시오" 같은 모호한 표현
+- ❌ 출력 형식 명시 없이 질문만 작성
+
+**✅ 반드시 포함:**
+- ✅ "## ❓ 질문" 헤더 (이모지 포함)
+- ✅ Q1. Q2. Q3. Q4. Q5. 형식 (최소 4개, 최대 7개)
+- ✅ 각 질문 끝에 (출력: 소수점 X자리) 형식 명시
+- ✅ 한 줄에 하나의 질문
 
 ---
 
-## 🚨🚨🚨 최종 출력 필수 포함 사항 (절대 생략 금지!) 🚨🚨🚨
+## 📋 문제 구조 (순서 엄수)
 
-**생성하는 문제는 반드시 다음 구조를 모두 포함해야 합니다:**
-
-```markdown
-# 제목
+```
+# [제목]
 
 ## 시나리오
-[2-3문장]
+[3그룹 이상을 비교하는 현실적 상황 2-3문장]
 
 ## 데이터 생성 코드
-[완전한 리터럴 데이터]
+```python
+[각 그룹 10-15개씩, 총 30-45행의 리터럴 데이터]
+```
 
 ## ❓ 질문
 
-**1)** [구체적인 질문 - 반드시 1)로 시작]
-- 출력 형식: [소수점 자릿수 등]
-
-**2)** [구체적인 질문 - 반드시 2)로 시작]
-- 출력 형식: [명시]
-
-**3)** [구체적인 질문 - 선택사항]
-- 출력 형식: [명시]
+Q1. [질문] (출력: 소수점 X자리)
+Q2. [질문] (출력: 소수점 X자리)
+...
 
 ## 힌트
 [라이브러리, 함수, 주의사항]
 
 ## 정답 코드
+```python
 [완전한 Python 코드]
 ```
-
-**❌ 절대 하지 말 것:**
-- 시나리오만 쓰고 질문을 생략
-- 줄글 형태로 "~을 분석하시오" 식의 모호한 지시
-- 1), 2), 3) 번호 없이 질문 나열
+```
 
 ---
 
-## 🔥 절대 잊지 말아야 할 핵심 규칙 (10회 반복 강조!)
+## ⚙️ 데이터 생성 규칙
 
-### ⚠️ 규칙 1: 데이터 크기 충분히! (3회 강조)
+### 필수 조건
+- ✅ **3개 이상의 그룹** (A, B, C 또는 그 이상)
+- ✅ **각 그룹당 10-15개** 샘플 (총 30-45행)
+- ✅ 완전한 리터럴 값 (np.random 사용 금지)
+- ✅ 변수명 한국어
+
+### 올바른 예시
 ```python
-# ❌ 잘못된 데이터 크기 (각 그룹 3-4개)
-# 그룹A: 3개, 그룹B: 3개, 그룹C: 3개 → 총 9개 (너무 작음!)
+import pandas as pd
 
-# ✅ 올바른 데이터 크기 (각 그룹 10-15개)
-# 그룹A: 12개, 그룹B: 14개, 그룹C: 13개 → 총 39-45개
+df = pd.DataFrame({
+    '직원ID': [f'E{i:03d}' for i in range(1, 40)],
+    '부서': ['영업']*13 + ['기획']*13 + ['개발']*13,
+    '월급여': [285, 310, 295, 320, 300, 315, 290, 305, 325, 295, 310, 300, 315,
+               310, 335, 320, 345, 325, 340, 315, 330, 350, 320, 335, 325, 340,
+               330, 355, 340, 365, 345, 360, 335, 350, 370, 340, 355, 345, 360]
+})
 ```
 
-**왜 그룹당 10개 이상이어야 하는가?**
-- 정규성 검정(Shapiro-Wilk)의 신뢰도 확보
-- 통계적 검정력(Power) 향상
-- 실전 시험 난이도 반영
+---
 
-### ⚠️ 규칙 2: TukeyHSD 결과 DataFrame 변환 간소화! (5회 강조)
+## 📊 ANOVA + TukeyHSD 분석 단계
+
+### 1단계: 정규성 검정 (각 그룹별)
 ```python
-# 🔥 TukeyHSD 결과를 DataFrame으로 간단히 변환하는 법!
+from scipy.stats import shapiro
 
-# 방법 1: summary() 사용 (권장!)
-tukey_result = pairwise_tukeyhsd(df['값'], df['그룹'], alpha=0.05)
-tukey_df = pd.DataFrame(data=tukey_result.summary().data[1:], 
-                         columns=tukey_result.summary().data[0])
+영업 = df[df['부서'] == '영업']['월급여']
+기획 = df[df['부서'] == '기획']['월급여']
+개발 = df[df['부서'] == '개발']['월급여']
 
-# 이제 tukey_df에서 쉽게 접근 가능:
-# tukey_df['reject'] - 유의한지 여부 (True/False)
+_, p_영업 = shapiro(영업)
+_, p_기획 = shapiro(기획)
+_, p_개발 = shapiro(개발)
+```
+
+### 2단계: 검정 방법 선택
+```
+모든 그룹 정규성 만족 (p > 0.05) → f_oneway (ANOVA)
+하나라도 불만족 (p ≤ 0.05) → kruskal (Kruskal-Wallis)
+```
+
+### 3단계: 일원분산분석 수행
+```python
+from scipy.stats import f_oneway, kruskal
+
+if all([p_영업 > 0.05, p_기획 > 0.05, p_개발 > 0.05]):
+    stat, pval = f_oneway(영업, 기획, 개발)
+else:
+    stat, pval = kruskal(영업, 기획, 개발)
+```
+
+### 4단계: TukeyHSD 사후검정 (정규성 만족 시만)
+```python
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
+
+# TukeyHSD 수행
+tukey = pairwise_tukeyhsd(df['월급여'], df['부서'], alpha=0.05)
+
+# DataFrame으로 변환 (권장 방법)
+tukey_df = pd.DataFrame(
+    data=tukey.summary().data[1:],
+    columns=tukey.summary().data[0]
+)
+
+# 결과 접근
+# tukey_df['reject'] - True면 유의한 차이
 # tukey_df['meandiff'] - 평균 차이
 # tukey_df['group1'], tukey_df['group2'] - 그룹 쌍
 ```
 
-### ⚠️ 규칙 3: 정규성 불만족 시 Kruskal-Wallis! (2회 강조)
-```python
-# 정규성 검정 후 조건부 로직 필수!
+---
 
-if all([p > 0.05 for p in [p_A, p_B, p_C]]):
-    # 정규성 만족 - ANOVA 사용
-    from scipy.stats import f_oneway
-    f_stat, p_value = f_oneway(그룹A, 그룹B, 그룹C)
-else:
-    # 정규성 불만족 - Kruskal-Wallis 사용
-    from scipy.stats import kruskal
-    h_stat, p_value = kruskal(그룹A, 그룹B, 그룹C)
+## 💡 질문 예시 (Q1. Q2. 형식 반드시 사용!)
+
 ```
-
-### 🚨 규칙 4: 명확한 질문 구조 (가장 중요!)
-**반드시 "❓ 질문" 섹션에 번호가 매겨진 구체적인 질문을 포함해야 합니다!**
-
-```markdown
 ## ❓ 질문
 
-**1)** 일원배치 분산분석(ANOVA)을 수행하고, F-통계량을 소수점 셋째 자리에서 반올림하여 출력하시오.
-- 출력 형식: 소수점 셋째 자리 반올림 (예: 12.345)
-
-**2)** TukeyHSD 사후검정을 수행하고, 유의수준 0.05에서 유의한 차이가 있는 그룹 쌍의 개수를 구하시오.
-- 출력 형식: 정수 (예: 2)
-
-**3)** TukeyHSD 결과에서 평균 차이가 가장 큰 그룹 쌍을 출력하시오.
-- 출력 형식: "그룹A-그룹B" 형태 (예: "C반-B반")
-```
-
-**절대 금지:**
-- ❌ 시나리오만 제공하고 구체적인 질문이 없는 경우
-- ❌ "분석하시오", "검정하시오" 등 모호한 지시
-- ❌ 출력 형식을 명시하지 않는 경우
-
-**반드시 포함:**
-- ✅ 각 질문에 **1)**, **2)**, **3)** 번호 매기기
-- ✅ 구체적인 작업 지시
-- ✅ 정확한 출력 형식
-- ✅ 2-3개의 구체적인 질문
-
----
-
-## 중요: 반드시 지켜야 할 데이터 생성 규칙
-
-### 1. 데이터 크기 (매우 중요!)
-- ✅ **전체 40-50행** (이전: 12-15행 → 개선: 40-50행)
-- ✅ **3개 이상의 그룹** 필수
-- ✅ **각 그룹당 10-15개** 데이터
-- 예: 그룹A 13개 + 그룹B 15개 + 그룹C 12개 = 총 40개
-
-### 2. 데이터 구조
-- **범주형 그룹 변수** 1개 (예: '반', '비료종류', '지역')
-- **연속형 측정 변수** 1개 (예: '성적', '수확량', '가격')
-- pandas DataFrame 형식
-- 변수명은 **한국어** 사용
-
-### 3. 데이터 생성 예시 (40행, 3그룹)
-```python
-import pandas as pd
-
-# ✅ 완전히 생성된 리터럴 데이터 제공 (np.random 사용 금지!)
-df = pd.DataFrame({
-    '학생': [f'S{i:02d}' for i in range(1, 41)],
-    '반': ['A반']*13 + ['B반']*14 + ['C반']*13,
-    '성적': [87.2, 83.5, 89.1, 85.8, 82.4, 88.0, 84.7, 86.3, 81.9, 90.2,
-             85.0, 83.8, 87.6,  # A반 13개 (평균 약 85)
-             76.4, 79.8, 74.2, 81.5, 77.3, 80.1, 75.9, 78.6, 82.3, 73.8,
-             79.0, 76.7, 80.5, 75.2,  # B반 14개 (평균 약 78)
-             93.5, 89.8, 95.2, 91.0, 88.7, 94.1, 90.6, 92.3, 96.0, 87.9,
-             93.8, 91.5, 89.2]  # C반 13개 (평균 약 92)
-})
+Q1. '영업' 부서의 월급여 평균을 소수점 2자리까지 구하시오. (출력: 소수점 2자리)
+Q2. '기획' 부서의 월급여 표준편차를 소수점 2자리까지 구하시오. (출력: 소수점 2자리)
+Q3. '영업' 부서의 Shapiro-Wilk 검정 p-value를 구하시오. (출력: 소수점 4자리)
+Q4. '기획' 부서의 Shapiro-Wilk 검정 p-value를 구하시오. (출력: 소수점 4자리)
+Q5. '개발' 부서의 Shapiro-Wilk 검정 p-value를 구하시오. (출력: 소수점 4자리)
+Q6. 적절한 일원분산분석을 수행하고 검정통계량을 구하시오. (출력: 소수점 3자리)
+Q7. 일원분산분석의 p-value를 구하시오. (출력: 소수점 4자리)
+Q8. 정규성을 만족하는 경우 TukeyHSD 사후검정을 수행하고, '영업'-'기획' 그룹 간 유의한 차이가 있는지 판단하시오. (출력: "있다" 또는 "없다")
 ```
 
 ---
 
-## ANOVA + TukeyHSD 완벽 가이드
-
-### ANOVA (Analysis of Variance, 일원분산분석)
-
-**언제 사용하는가?**
-- **3개 이상의 독립된 그룹**의 평균을 비교할 때
-- 예: A반, B반, C반의 성적 비교
-- 예: 3가지 비료의 작물 수확량 비교
-- 2개 그룹이면 t검정 사용!
-
-**귀무가설과 대립가설:**
-```
-H0 (귀무가설): μ_A = μ_B = μ_C (모든 그룹의 평균이 같다)
-H1 (대립가설): 적어도 하나의 그룹 평균이 다르다
-```
-
-**ANOVA 결과 해석:**
-- p-value < 0.05: H0 기각 → 적어도 하나의 그룹이 다름 (사후검정 필요!)
-- p-value ≥ 0.05: H0 채택 → 모든 그룹이 같음 (사후검정 불필요)
-
-### TukeyHSD 사후검정 (Post-hoc Test)
-
-**왜 필요한가?**
-- ANOVA는 "적어도 하나가 다르다"만 알려줌
-- TukeyHSD는 "A와 B가 다르다", "B와 C가 다르다" 등을 구체적으로 알려줌
-
-**TukeyHSD 결과 해석:**
-```
-reject = True: 두 그룹 간 유의한 차이 있음
-reject = False: 두 그룹 간 유의한 차이 없음
-meandiff: 두 그룹의 평균 차이 (group1 - group2)
-```
-
----
-
-## 🎯 힌트 섹션 (대폭 강화!)
-
-### 1️⃣ 필수 라이브러리
-```python
-import pandas as pd
-import numpy as np
-from scipy.stats import shapiro, levene, f_oneway, kruskal
-from statsmodels.stats.multicomp import pairwise_tukeyhsd
-```
-
-### 2️⃣ 주요 함수 사용법 (코드 예시 포함)
-
-#### A. 그룹 데이터 분리
-```python
-# 방법 1: 각 그룹을 개별 변수로
-A반 = df[df['반']=='A반']['성적']
-B반 = df[df['반']=='B반']['성적']
-C반 = df[df['반']=='C반']['성적']
-
-# 방법 2: 리스트로 저장
-groups = [df[df['반']==g]['성적'] for g in ['A반', 'B반', 'C반']]
-```
-
-#### B. 정규성 검정 (Shapiro-Wilk) - 각 그룹별로!
-```python
-from scipy.stats import shapiro
-
-# 각 그룹별로 정규성 검정
-_, p_A = shapiro(A반)
-_, p_B = shapiro(B반)
-_, p_C = shapiro(C반)
-
-print(f"A반 정규성 p-value: {p_A:.4f}")
-print(f"B반 정규성 p-value: {p_B:.4f}")
-print(f"C반 정규성 p-value: {p_C:.4f}")
-
-# 모든 그룹이 정규성을 만족하는지 확인
-정규성_만족 = all([p > 0.05 for p in [p_A, p_B, p_C]])
-
-if 정규성_만족:
-    print("모든 그룹이 정규성을 만족 → ANOVA 사용")
-else:
-    print("정규성 불만족 → Kruskal-Wallis 사용")
-```
-
-#### C. 등분산성 검정 (Levene Test)
-```python
-from scipy.stats import levene
-
-# 모든 그룹 간 등분산성 검정
-stat, p_levene = levene(A반, B반, C반)
-
-print(f"등분산성 p-value: {p_levene:.4f}")
-
-if p_levene > 0.05:
-    print("등분산성 만족 → 표준 ANOVA 사용 가능")
-else:
-    print("등분산성 불만족 → Welch's ANOVA 고려 (또는 Kruskal-Wallis)")
-```
-
-#### D. 일원분산분석 (ANOVA)
-```python
-from scipy.stats import f_oneway
-
-# 정규성 만족 시
-f_stat, p_anova = f_oneway(A반, B반, C반)
-
-print(f"F-통계량: {f_stat:.3f}")
-print(f"p-value: {p_anova:.4f}")
-
-if p_anova < 0.05:
-    print("귀무가설 기각 → 적어도 하나의 그룹 평균이 다름 (사후검정 필요!)")
-else:
-    print("귀무가설 채택 → 모든 그룹 평균이 같음 (사후검정 불필요)")
-```
-
-#### E. Kruskal-Wallis 검정 (비모수 대안)
-```python
-from scipy.stats import kruskal
-
-# 정규성 불만족 시
-h_stat, p_kruskal = kruskal(A반, B반, C반)
-
-print(f"H-통계량: {h_stat:.3f}")
-print(f"p-value: {p_kruskal:.4f}")
-```
-
-#### F. TukeyHSD 사후검정 (간소화된 방법! 2번째 강조)
-```python
-from statsmodels.stats.multicomp import pairwise_tukeyhsd
-
-# TukeyHSD 수행
-tukey_result = pairwise_tukeyhsd(endog=df['성적'], 
-                                  groups=df['반'], 
-                                  alpha=0.05)
-
-# 결과 출력
-print(tukey_result)
-
-# 🔥 DataFrame으로 변환 (중요! 3번째 강조)
-tukey_df = pd.DataFrame(data=tukey_result.summary().data[1:], 
-                         columns=tukey_result.summary().data[0])
-
-print(tukey_df)
-
-# 유의한 쌍의 개수
-유의한_쌍_개수 = tukey_result.reject.sum()
-# 또는: (tukey_df['reject'] == True).sum()
-
-# 특정 그룹 쌍 간 평균 차이 찾기
-bc_pair = tukey_df[((tukey_df['group1']=='B반') & (tukey_df['group2']=='C반')) |
-                   ((tukey_df['group1']=='C반') & (tukey_df['group2']=='B반'))]
-meandiff = float(bc_pair['meandiff'].values[0])
-```
-
-#### G. 효과크기 (Effect Size) 계산 (추가!)
-```python
-# Eta-squared (η²) - 설명된 분산의 비율
-# η² = SS_between / SS_total
-
-# 전체 평균
-grand_mean = df['성적'].mean()
-
-# 그룹별 평균과 크기
-groups_data = df.groupby('반')['성적'].agg(['mean', 'count'])
-
-# SS_between (그룹 간 제곱합)
-SS_between = sum(groups_data['count'] * (groups_data['mean'] - grand_mean)**2)
-
-# SS_total (전체 제곱합)
-SS_total = sum((df['성적'] - grand_mean)**2)
-
-# Eta-squared
-eta_squared = SS_between / SS_total
-print(f"Eta-squared: {eta_squared:.4f}")
-
-# 해석:
-# η² < 0.01: 작은 효과
-# 0.01 ≤ η² < 0.06: 중간 효과
-# η² ≥ 0.06: 큰 효과
-```
-
-### 3️⃣ 의사결정 트리 (문제 풀이 순서)
-
-```
-시작
- │
- ├─ 1. 데이터 확인
- │   ├─ 그룹이 3개 이상인가? → 아니면 t검정 사용
- │   ├─ 각 그룹당 10개 이상 데이터? → 권장
- │   └─ 측정 변수는 연속형? → OK
- │
- ├─ 2. 그룹 데이터 분리
- │   └─ 그룹A = df[df['그룹']=='A']['값']
- │
- ├─ 3. 정규성 검정 (각 그룹별로!)
- │   ├─ shapiro(그룹A), shapiro(그룹B), shapiro(그룹C)
- │   ├─ 모두 p > 0.05? → 정규성 만족 → ANOVA
- │   └─ 하나라도 p ≤ 0.05? → 정규성 불만족 → Kruskal-Wallis
- │
- ├─ 4. 등분산성 검정 (선택)
- │   └─ levene(그룹A, 그룹B, 그룹C)
- │
- ├─ 5. ANOVA 또는 Kruskal-Wallis
- │   ├─ 정규성 OK → f_oneway(A, B, C)
- │   └─ 정규성 X → kruskal(A, B, C)
- │
- ├─ 6. 결과 해석
- │   ├─ p < 0.05? → 그룹 간 차이 있음 → 사후검정 진행
- │   └─ p ≥ 0.05? → 그룹 간 차이 없음 → 종료
- │
- ├─ 7. TukeyHSD 사후검정 (p < 0.05일 때만!)
- │   ├─ tukey_result = pairwise_tukeyhsd(df['값'], df['그룹'])
- │   ├─ 🔥 DataFrame 변환 (4번째 강조)
- │   └─ 유의한 쌍 확인 (reject=True)
- │
- └─ 8. 효과크기 계산 (선택)
-     └─ Eta-squared 또는 Omega-squared
-```
-
-### 4️⃣ 흔한 실수와 함정
-
-#### ❌ 실수 1: 데이터 크기 너무 작음
-```python
-# ❌ 나쁜 예: 각 그룹 3-4개 (총 9-12개)
-# → 정규성 검정 신뢰도 낮음
-# → 통계적 검정력 부족
-
-# ✅ 좋은 예: 각 그룹 10-15개 (총 30-45개)
-# → 정규성 검정 안정적
-# → 통계적 검정력 충분
-```
-
-#### ❌ 실수 2: 정규성 검정 전체 데이터로 수행
-```python
-# ❌ 틀린 방법
-_, p = shapiro(df['성적'])  # 전체 데이터로 검정 (틀림!)
-
-# ✅ 올바른 방법 - 각 그룹별로!
-_, p_A = shapiro(A반)
-_, p_B = shapiro(B반)
-_, p_C = shapiro(C반)
-```
-
-#### ❌ 실수 3: ANOVA 유의하지 않은데 사후검정 수행
-```python
-# ❌ 틀린 흐름
-f_stat, p_anova = f_oneway(A, B, C)
-tukey_result = pairwise_tukeyhsd(...)  # p_anova 확인 없이 무조건 수행
-
-# ✅ 올바른 흐름
-if p_anova < 0.05:
-    # ANOVA 유의 → 사후검정 수행
-    tukey_result = pairwise_tukeyhsd(...)
-else:
-    # ANOVA 유의하지 않음 → 사후검정 불필요
-    print("그룹 간 차이 없음")
-```
-
-#### ❌ 실수 4: TukeyHSD 결과 접근 복잡하게
-```python
-# ❌ 복잡한 방법
-# summary()를 파싱하려고 문자열 처리...
-
-# ✅ 간단한 방법 (5번째 강조!)
-tukey_df = pd.DataFrame(data=tukey_result.summary().data[1:], 
-                         columns=tukey_result.summary().data[0])
-
-# 이제 간단히 접근:
-유의한_개수 = (tukey_df['reject'] == True).sum()
-bc_meandiff = tukey_df[tukey_df['group1']=='B반']['meandiff'].values[0]
-```
-
-#### ❌ 실수 5: 2개 그룹에 ANOVA 사용
-```python
-# ❌ 틀린 선택
-# 그룹A, 그룹B 2개만 있는데 ANOVA 사용 (비효율적)
-
-# ✅ 올바른 선택
-# 2개 그룹 → t검정 사용
-from scipy.stats import ttest_ind
-t_stat, p_value = ttest_ind(그룹A, 그룹B)
-```
-
-### 5️⃣ 체크리스트 (분석 전 확인!)
-
-```
-데이터 확인:
-✅ 그룹이 3개 이상인가?
-✅ 각 그룹당 10개 이상 데이터가 있는가?
-✅ 전체 데이터가 40-50행인가?
-✅ 측정 변수는 연속형인가?
-
-분석 순서:
-✅ 그룹별로 데이터를 분리했는가?
-✅ 각 그룹별로 정규성 검정을 수행했는가? (전체 X)
-✅ 등분산성 검정을 수행했는가?
-✅ 정규성 결과에 따라 ANOVA/Kruskal-Wallis를 선택했는가?
-✅ ANOVA 결과가 유의한 경우에만 사후검정을 수행했는가?
-
-TukeyHSD:
-✅ pairwise_tukeyhsd(endog, groups) 순서가 맞는가?
-✅ DataFrame으로 변환했는가? (접근 용이)
-✅ reject 열로 유의한 쌍을 확인했는가?
-✅ meandiff 열로 평균 차이를 확인했는가?
-```
-
----
-
-## 효과크기(Effect Size) 이해
-
-### Eta-squared (η²)
-```
-η² = SS_between / SS_total
-
-해석:
-- η² = 0.01: 작은 효과 (그룹 간 차이가 작음)
-- η² = 0.06: 중간 효과
-- η² = 0.14: 큰 효과 (그룹 간 차이가 큼)
-```
-
-### Omega-squared (ω²) - 더 보수적인 추정
-```
-ω² = (SS_between - (k-1)MS_within) / (SS_total + MS_within)
-
-k: 그룹 개수
-일반적으로 η²보다 작은 값
-```
-
----
-
-## 문제 생성 템플릿
-
-### 기본 문제 구조
-```markdown
-# ANOVA + TukeyHSD 문제: [제목]
-
-## 시나리오
-[3개 이상 그룹 비교 상황 - 구체적이고 현실적으로]
-
-## 데이터 생성 코드
-[DataFrame 코드 - 반드시 40-50행! 각 그룹 10-15개]
-
-## 질문
-1) 각 그룹별 정규성 검정 (Shapiro-Wilk)
-2) 등분산성 검정 (Levene)
-3) ANOVA 또는 Kruskal-Wallis F-통계량/H-통계량
-4) p-value 출력
-5) TukeyHSD 사후검정 수행 (p < 0.05일 때만)
-6) 유의한 차이가 있는 그룹 쌍의 개수
-7) 특정 그룹 쌍 간 평균 차이(meandiff)
-8) (선택) 효과크기(Eta-squared)
-
-## 힌트
-[위의 "힌트 섹션" 내용 축약 포함]
-- 필수 강조: 각 그룹별 정규성 검정, TukeyHSD DataFrame 변환
-
-## 정답 코드
-[전체 풀이 과정 - 데이터 생성부터 모든 질문 답변까지]
-```
-
----
-
-## 🎯 문제 생성 체크리스트
-
-문제를 생성하기 전에 반드시 확인하세요:
-
-### 데이터 관련
-- [ ] 전체 데이터는 40-50행인가?
-- [ ] 그룹이 3개 이상인가?
-- [ ] 각 그룹당 10-15개 데이터가 있는가?
-- [ ] 그룹 변수는 범주형인가?
-- [ ] 측정 변수는 연속형인가?
-- [ ] 변수명은 한국어로 작성했는가?
-
-### 힌트 섹션
-- [ ] 각 그룹별 정규성 검정 방법을 명확히 설명했는가?
-- [ ] TukeyHSD DataFrame 변환 방법을 3회 이상 강조했는가?
-- [ ] 정규성 불만족 시 Kruskal-Wallis 사용을 설명했는가?
-- [ ] 의사결정 트리가 포함되어 있는가?
-- [ ] 흔한 실수 섹션이 포함되어 있는가?
-- [ ] 효과크기 계산 방법을 설명했는가?
-
-### 질문 구성
-- [ ] 정규성 검정 질문이 포함되어 있는가?
-- [ ] 등분산성 검정 질문이 포함되어 있는가?
-- [ ] ANOVA F-통계량 질문이 포함되어 있는가?
-- [ ] p-value 질문이 포함되어 있는가?
-- [ ] TukeyHSD 수행 질문이 포함되어 있는가?
-- [ ] 유의한 쌍의 개수 질문이 포함되어 있는가?
-- [ ] 특정 쌍 간 평균 차이 질문이 포함되어 있는가?
-- [ ] 5-8개의 소문항으로 구성했는가?
-
-### 정답 코드
-- [ ] 데이터 생성 코드가 포함되어 있는가?
-- [ ] 그룹별 데이터 분리 코드가 포함되어 있는가?
-- [ ] 각 그룹별 정규성 검정 코드가 포함되어 있는가?
-- [ ] 조건부 로직(ANOVA vs Kruskal-Wallis)이 포함되어 있는가?
-- [ ] TukeyHSD DataFrame 변환 코드가 포함되어 있는가?
-- [ ] 모든 질문에 대한 답변 코드가 포함되어 있는가?
-- [ ] 주석으로 각 단계를 명확히 설명했는가?
-
-### 시나리오
-- [ ] 구체적이고 현실적인 상황인가?
-- [ ] 3개 이상 그룹 비교가 자연스러운 상황인가?
-- [ ] 측정 변수가 연속형인 상황인가?
-
----
-
-## 완성된 문제 예시 (40행 데이터, 3그룹)
+## 🎯 힌트 섹션 예시
 
 ```markdown
-# ANOVA + TukeyHSD 문제: 교육 방법에 따른 학습 효과 비교
-
-## 시나리오
-한 교육연구소에서 3가지 교육 방법(강의식, 토론식, 프로젝트식)이 학생들의 학업 성취도에 미치는 영향을 비교하기 위해 실험을 진행했습니다. 각 교육 방법을 적용한 학생들의 기말고사 점수(점)를 수집했습니다. 교육 방법에 따라 학업 성취도에 유의한 차이가 있는지, 그리고 어떤 교육 방법 간에 차이가 있는지 분석하려고 합니다.
-
-## 데이터 생성 코드
-```python
-import pandas as pd
-
-# ✅ 완전히 생성된 리터럴 데이터 (np.random 사용 금지!)
-df = pd.DataFrame({
-    '학생번호': [f'S{i:03d}' for i in range(1, 41)],
-    '교육방법': ['강의식']*13 + ['토론식']*14 + ['프로젝트식']*13,
-    '점수': [73.2, 78.5, 71.8, 76.4, 74.9, 79.1, 72.6, 77.3, 70.5, 75.8,
-             74.1, 76.7, 73.0,  # 강의식 13개 (평균 약 75)
-             84.3, 79.6, 85.1, 81.2, 78.8, 86.4, 82.7, 80.5, 83.9, 77.2,
-             85.8, 81.0, 84.6, 79.3,  # 토론식 14개 (평균 약 82)
-             90.5, 86.2, 91.8, 87.4, 93.1, 88.9, 85.6, 92.3, 89.7, 94.0,
-             87.1, 91.2, 88.5]  # 프로젝트식 13개 (평균 약 88)
-})
-
-print(df)
-print(f"\n총 학생 수: {len(df)}")
-print(f"강의식: {(df['교육방법']=='강의식').sum()}명")
-print(f"토론식: {(df['교육방법']=='토론식').sum()}명")
-print(f"프로젝트식: {(df['교육방법']=='프로젝트식').sum()}명")
-```
-
-## 질문
-
-**1)** 각 교육 방법 그룹(강의식, 토론식, 프로젝트식)의 점수 데이터에 대해 Shapiro-Wilk 정규성 검정을 수행하시오.
-- 세 그룹 모두 정규성을 만족하면 1, 하나라도 만족하지 않으면 0을 출력
-
-**2)** 세 그룹의 등분산성을 Levene 검정으로 확인하시오.
-- p-value를 소수점 넷째 자리에서 반올림하여 출력
-
-**3)** 일원분산분석(ANOVA)을 수행하여 F-통계량을 구하시오.
-- 1)의 결과가 0이면 Kruskal-Wallis H-통계량 사용
-- 소수점 셋째 자리에서 반올림하여 출력
-
-**4)** 3)에서 수행한 검정의 p-value를 소수점 넷째 자리에서 반올림하여 출력하시오.
-
-**5)** 유의수준 0.05에서 4)의 결과가 유의한 경우, TukeyHSD 사후검정을 수행하시오.
-- TukeyHSD 결과 전체를 출력
-
-**6)** 5)의 TukeyHSD 결과에서 유의한 차이가 있는 그룹 쌍의 개수를 구하시오.
-- 출력 형식: 정수 (예: 2)
-
-**7)** 5)의 TukeyHSD 결과에서 '토론식'과 '프로젝트식' 간의 평균 차이(meandiff)를 소수점 둘째 자리에서 반올림하여 출력하시오.
-
-**8)** 효과크기(Eta-squared)를 계산하여 소수점 넷째 자리에서 반올림하여 출력하시오.
-
 ## 힌트
 
-### 필수 라이브러리
-```python
-from scipy.stats import shapiro, levene, f_oneway, kruskal
-from statsmodels.stats.multicomp import pairwise_tukeyhsd
-```
+### 필요한 라이브러리
+- pandas, numpy
+- scipy.stats: shapiro, f_oneway, kruskal
+- statsmodels.stats.multicomp: pairwise_tukeyhsd
 
-### 그룹 분리
-```python
-강의식 = df[df['교육방법']=='강의식']['점수']
-토론식 = df[df['교육방법']=='토론식']['점수']
-프로젝트식 = df[df['교육방법']=='프로젝트식']['점수']
-```
-
-### 정규성 검정 (각 그룹별로!)
-```python
-_, p_강의 = shapiro(강의식)
-_, p_토론 = shapiro(토론식)
-_, p_프로젝트 = shapiro(프로젝트식)
-
-정규성_만족 = all([p > 0.05 for p in [p_강의, p_토론, p_프로젝트]])
-```
-
-### ANOVA vs Kruskal-Wallis
-```python
-if 정규성_만족:
-    f_stat, p_value = f_oneway(강의식, 토론식, 프로젝트식)
-else:
-    h_stat, p_value = kruskal(강의식, 토론식, 프로젝트식)
-```
-
-### TukeyHSD (간소화된 방법!)
-```python
-# TukeyHSD 수행
-tukey_result = pairwise_tukeyhsd(df['점수'], df['교육방법'], alpha=0.05)
-
-# 🔥 DataFrame으로 변환 (매우 중요!)
-tukey_df = pd.DataFrame(data=tukey_result.summary().data[1:], 
-                         columns=tukey_result.summary().data[0])
-
-# 유의한 쌍의 개수
-유의한_개수 = (tukey_df['reject'] == True).sum()
-
-# 특정 쌍 간 평균 차이
-pair = tukey_df[((tukey_df['group1']=='토론식') & (tukey_df['group2']=='프로젝트식')) |
-                ((tukey_df['group1']=='프로젝트식') & (tukey_df['group2']=='토론식'))]
-meandiff = float(pair['meandiff'].values[0])
-```
-
-### 효과크기 (Eta-squared)
-```python
-grand_mean = df['점수'].mean()
-groups_data = df.groupby('교육방법')['점수'].agg(['mean', 'count'])
-
-SS_between = sum(groups_data['count'] * (groups_data['mean'] - grand_mean)**2)
-SS_total = sum((df['점수'] - grand_mean)**2)
-
-eta_squared = SS_between / SS_total
-```
+### 주요 함수
+1. 그룹 분리: `df[df['그룹'] == '그룹A']['값']`
+2. 정규성 검정: `shapiro(데이터)` → p > 0.05면 정규분포
+3. ANOVA: `f_oneway(그룹A, 그룹B, 그룹C)`
+4. Kruskal-Wallis: `kruskal(그룹A, 그룹B, 그룹C)`
+5. TukeyHSD: `pairwise_tukeyhsd(df['값'], df['그룹'], alpha=0.05)`
+6. DataFrame 변환: `pd.DataFrame(data=tukey.summary().data[1:], columns=tukey.summary().data[0])`
 
 ### 흔한 실수
-- ❌ 전체 데이터로 정규성 검정 (틀림!)
-- ✅ 각 그룹별로 정규성 검정 (정답!)
-- ❌ ANOVA 유의하지 않은데 사후검정 수행
-- ✅ p < 0.05일 때만 사후검정
+❌ 그룹당 샘플 수가 10개 미만
+❌ 정규성 불만족인데 ANOVA 사용
+❌ TukeyHSD에 raw data 대신 그룹별 데이터 입력
+❌ TukeyHSD 결과에서 reject 열 확인 안 함
+```
 
-## 정답 코드
+---
+
+## 💻 정답 코드 예시
+
+**⚠️ print 문 최소화 - 요구사항만 출력**
+
 ```python
 import pandas as pd
 import numpy as np
-from scipy.stats import shapiro, levene, f_oneway, kruskal
+from scipy.stats import shapiro, f_oneway, kruskal
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
-# 데이터 (위와 동일하게 완전한 리터럴 값 사용)
+# 데이터 생성
 df = pd.DataFrame({
-    '학생번호': [f'S{i:03d}' for i in range(1, 41)],
-    '교육방법': ['강의식']*13 + ['토론식']*14 + ['프로젝트식']*13,
-    '점수': [73.2, 78.5, 71.8, 76.4, 74.9, 79.1, 72.6, 77.3, 70.5, 75.8,
-             74.1, 76.7, 73.0,
-             84.3, 79.6, 85.1, 81.2, 78.8, 86.4, 82.7, 80.5, 83.9, 77.2,
-             85.8, 81.0, 84.6, 79.3,
-             90.5, 86.2, 91.8, 87.4, 93.1, 88.9, 85.6, 92.3, 89.7, 94.0,
-             87.1, 91.2, 88.5]
+    '직원ID': [f'E{i:03d}' for i in range(1, 40)],
+    '부서': ['영업']*13 + ['기획']*13 + ['개발']*13,
+    '월급여': [285, 310, 295, 320, 300, 315, 290, 305, 325, 295, 310, 300, 315,
+               310, 335, 320, 345, 325, 340, 315, 330, 350, 320, 335, 325, 340,
+               330, 355, 340, 365, 345, 360, 335, 350, 370, 340, 355, 345, 360]
 })
 
 # 그룹 분리
-강의식 = df[df['교육방법']=='강의식']['점수']
-토론식 = df[df['교육방법']=='토론식']['점수']
-프로젝트식 = df[df['교육방법']=='프로젝트식']['점수']
+영업 = df[df['부서'] == '영업']['월급여']
+기획 = df[df['부서'] == '기획']['월급여']
+개발 = df[df['부서'] == '개발']['월급여']
 
-# 1) 정규성 검정 (각 그룹별로!)
-_, p_강의 = shapiro(강의식)
-_, p_토론 = shapiro(토론식)
-_, p_프로젝트 = shapiro(프로젝트식)
+# Q1-Q2: 기술통계
+print(round(영업.mean(), 2))
+print(round(기획.std(), 2))
 
-정규성_만족 = 1 if all([p > 0.05 for p in [p_강의, p_토론, p_프로젝트]]) else 0
-print(f"1) 정규성 만족 여부: {정규성_만족}")
-print(f"   강의식 p={p_강의:.4f}, 토론식 p={p_토론:.4f}, 프로젝트식 p={p_프로젝트:.4f}\n")
+# Q3-Q5: 정규성 검정
+_, p_영업 = shapiro(영업)
+_, p_기획 = shapiro(기획)
+_, p_개발 = shapiro(개발)
+print(round(p_영업, 4))
+print(round(p_기획, 4))
+print(round(p_개발, 4))
 
-# 2) 등분산성 검정
-stat_lev, p_lev = levene(강의식, 토론식, 프로젝트식)
-print(f"2) 등분산성 p-value: {round(p_lev, 4)}\n")
-
-# 3-4) ANOVA 또는 Kruskal-Wallis
-if 정규성_만족 == 1:
-    # 정규성 만족 - ANOVA 사용
-    f_stat, p_value = f_oneway(강의식, 토론식, 프로젝트식)
-    print("(정규성 만족 → ANOVA 사용)")
-    print(f"3) F-통계량: {round(f_stat, 3)}")
+# Q6-Q7: 일원분산분석
+if all([p_영업 > 0.05, p_기획 > 0.05, p_개발 > 0.05]):
+    stat, pval = f_oneway(영업, 기획, 개발)
 else:
-    # 정규성 불만족 - Kruskal-Wallis 사용
-    h_stat, p_value = kruskal(강의식, 토론식, 프로젝트식)
-    print("(정규성 불만족 → Kruskal-Wallis 사용)")
-    print(f"3) H-통계량: {round(h_stat, 3)}")
+    stat, pval = kruskal(영업, 기획, 개발)
 
-print(f"4) p-value: {round(p_value, 4)}\n")
+print(round(stat, 3))
+print(round(pval, 4))
 
-# 5-7) TukeyHSD 사후검정
-if p_value < 0.05:
-    print("5) TukeyHSD 사후검정 수행:")
-    tukey_result = pairwise_tukeyhsd(endog=df['점수'], 
-                                      groups=df['교육방법'], 
-                                      alpha=0.05)
-    print(tukey_result)
-    print()
-    
-    # 🔥 DataFrame으로 변환 (간소화!)
-    tukey_df = pd.DataFrame(data=tukey_result.summary().data[1:], 
-                             columns=tukey_result.summary().data[0])
-    
-    # 6) 유의한 차이가 있는 쌍의 개수
-    reject_count = (tukey_df['reject'] == True).sum()
-    print(f"6) 유의한 차이가 있는 그룹 쌍의 개수: {reject_count}\n")
-    
-    # 7) 토론식과 프로젝트식 간 평균 차이
-    pair = tukey_df[((tukey_df['group1']=='토론식') & (tukey_df['group2']=='프로젝트식')) |
-                    ((tukey_df['group1']=='프로젝트식') & (tukey_df['group2']=='토론식'))]
-    
-    if len(pair) > 0:
-        meandiff = float(pair['meandiff'].values[0])
-        print(f"7) 토론식-프로젝트식 평균 차이: {round(meandiff, 2)}\n")
-else:
-    print("5) ANOVA 결과가 유의하지 않으므로 사후검정 불필요")
-    print("6) 0")
-    print("7) 해당 없음\n")
+# Q8: TukeyHSD 사후검정 (정규성 만족 시만)
+if all([p_영업 > 0.05, p_기획 > 0.05, p_개발 > 0.05]):
+    tukey = pairwise_tukeyhsd(df['월급여'], df['부서'], alpha=0.05)
+    tukey_df = pd.DataFrame(
+        data=tukey.summary().data[1:],
+        columns=tukey.summary().data[0]
+    )
 
-# 8) 효과크기 (Eta-squared)
-grand_mean = df['점수'].mean()
-groups_data = df.groupby('교육방법')['점수'].agg(['mean', 'count'])
+    # '영업'-'기획' 쌍 찾기
+    pair = tukey_df[
+        ((tukey_df['group1'] == '영업') & (tukey_df['group2'] == '기획')) |
+        ((tukey_df['group1'] == '기획') & (tukey_df['group2'] == '영업'))
+    ]
 
-SS_between = sum(groups_data['count'] * (groups_data['mean'] - grand_mean)**2)
-SS_total = sum((df['점수'] - grand_mean)**2)
-
-eta_squared = SS_between / SS_total
-print(f"8) Eta-squared (효과크기): {round(eta_squared, 4)}")
-
-# 효과크기 해석
-if eta_squared < 0.01:
-    print("   → 작은 효과")
-elif eta_squared < 0.06:
-    print("   → 중간 효과")
-else:
-    print("   → 큰 효과")
-```
+    print("있다" if pair['reject'].values[0] else "없다")
 ```
 
 ---
 
-## 출력 형식
+## ✅ 생성 체크리스트
 
-생성된 문제는 반드시 다음 구조를 따라야 합니다:
-
-```
-# ANOVA + TukeyHSD 문제: [제목]
-
-## 시나리오
-[3개 이상 그룹 비교 상황 - 구체적이고 현실적으로]
-
-## 데이터 생성 코드
-[DataFrame 코드 - 반드시 40-50행! 각 그룹 10-15개]
-
-## 질문
-1) 정규성 검정 (각 그룹별로!)
-2) 등분산성 검정
-3) ANOVA F-통계량 또는 Kruskal-Wallis H-통계량
-4) p-value
-5) TukeyHSD 수행 (p < 0.05일 때만)
-6) 유의한 쌍의 개수
-7) 특정 쌍 간 평균 차이
-8) (선택) 효과크기
-
-## 힌트
-[필수 라이브러리, 함수 사용법, 흔한 실수]
-- 각 그룹별 정규성 검정 강조!
-- TukeyHSD DataFrame 변환 강조!
-
-## 정답 코드
-[전체 풀이 코드 - 조건부 로직 포함]
-```
-
----
-
-## 마지막 당부사항
-
-1. **데이터는 반드시 40-50행으로 생성하세요** (각 그룹 10-15개)
-2. **정규성 검정은 각 그룹별로 수행하세요** (전체 데이터 X)
-3. **TukeyHSD는 DataFrame으로 변환하세요** (접근 용이)
-4. **ANOVA 유의할 때만 사후검정 수행하세요** (조건문 필수)
-5. **힌트 섹션을 대폭 강화하세요** (함수 사용법, 의사결정 트리, 흔한 실수)
-6. **효과크기도 계산하면 더 좋습니다** (Eta-squared 또는 Omega-squared)
-
-이제 위 지침에 따라 ANOVA + TukeyHSD 문제를 생성해주세요!
+- [ ] "## ❓ 질문" 헤더 (이모지 포함)
+- [ ] Q1. Q2. Q3. 형식 사용 (**1)**, **2)** 아님)
+- [ ] 각 질문에 (출력: ...) 명시
+- [ ] 3개 이상 그룹
+- [ ] 각 그룹 10-15개 샘플
+- [ ] 변수명 한국어
+- [ ] 리터럴 값 (np.random 없음)
+- [ ] TukeyHSD DataFrame 변환 코드 포함
+- [ ] print 문 최소화
