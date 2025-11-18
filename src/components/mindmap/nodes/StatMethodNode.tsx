@@ -237,7 +237,7 @@ const StatMethodNode = ({ data, id }: NodeProps) => {
 
       {isExpanded && code && (
         <Card
-          className="absolute left-[370px] top-0 border-2 border-orange-400 shadow-lg bg-white min-w-[500px] max-w-[600px]"
+          className="absolute left-[370px] top-0 border-2 border-orange-400 shadow-lg bg-white w-[550px]"
           style={{ zIndex: 10000 }}
           onMouseDown={(e) => e.stopPropagation()}
           onPointerDown={(e) => e.stopPropagation()}
@@ -322,7 +322,7 @@ const StatMethodNode = ({ data, id }: NodeProps) => {
 
       {showPractice && (
         <Card
-          className="absolute left-[1000px] top-0 border-2 border-green-400 shadow-lg bg-white min-w-[600px] max-w-[700px]"
+          className="absolute left-[970px] top-0 border-2 border-green-400 shadow-lg bg-white w-[650px]"
           style={{ zIndex: 10001 }}
           onMouseDown={(e) => e.stopPropagation()}
           onPointerDown={(e) => e.stopPropagation()}

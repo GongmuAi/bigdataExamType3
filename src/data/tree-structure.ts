@@ -2,7 +2,7 @@ import { StatNode } from '@/types/mindmap';
 
 export const statisticsTree: StatNode = {
   id: 'root',
-  label: '통계 분석 의사결정 트리',
+  label: '빅분기 3유형',
   type: 'category',
   children: [
     {

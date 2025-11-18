@@ -36,6 +36,20 @@ const promptMapping: Record<string, string> = {
   // F-검정 및 합동분산추정량
   'F = var1/var2': 'improved_prompt_f_test_pooled_variance.md',
   's²_p = ((n₁-1)s₁²+(n₂-1)s₂²)/(n₁+n₂-2)': 'improved_prompt_f_test_pooled_variance.md',
+
+  // 정규성 검정
+  'shapiro()': 'improved_prompt_normality.md',
+  'anderson()': 'improved_prompt_normality.md',
+
+  // 등분산성 검정
+  'levene()': 'improved_prompt_variance_test.md',
+  'bartlett()': 'improved_prompt_variance_test.md',
+
+  // 비율 z 검정
+  'proportions_ztest()': 'improved_prompt_proportion_ztest.md',
+
+  // 이항검정
+  'binom_test()': 'improved_prompt_binomial_test.md',
 };
 
 function getImprovedPrompt(functionName: string): string | null {
@@ -82,8 +96,38 @@ export async function POST(request: NextRequest) {
     let prompt: string;
 
     if (improvedPrompt) {
+      // sklearn 예측용인 경우 추가 안내
+      const sklearnNote = library === 'sklearn' ? `
+
+---
+
+⚠️ **중요: sklearn 라이브러리 사용 안내**
+
+이 문제는 sklearn을 사용하는 **예측용** 문제입니다. 다음 사항을 반드시 준수하세요:
+
+1. **sm.add_constant() 사용하지 마세요** (sklearn은 자동으로 절편 추가)
+2. **statsmodels 관련 코드 제거** (sm.OLS, sm.Logit 등 사용 금지)
+3. **sklearn 코드만 사용**:
+   - 다중선형회귀: \`from sklearn.linear_model import LinearRegression\`
+   - 로지스틱회귀: \`from sklearn.linear_model import LogisticRegression\`
+4. **모델 사용법**:
+   \`\`\`python
+   model = LinearRegression()  # 또는 LogisticRegression()
+   model.fit(X, y)
+   model.coef_        # 회귀계수
+   model.intercept_   # 절편
+   model.predict(새로운X)  # 예측
+   \`\`\`
+5. **p-value, 오즈비 질문 금지** (sklearn은 통계적 추론 기능 없음)
+6. **예측 중심 질문 구성**: 회귀계수, 절편, 예측값, R² 스코어 등
+
+**반드시 sklearn 문법만 사용하세요. statsmodels 코드가 포함되면 안 됩니다!**
+
+---
+` : '';
+
       // 개선된 프롬프트 사용
-      prompt = `${improvedPrompt}
+      prompt = `${improvedPrompt}${sklearnNote}
 
 ---
 

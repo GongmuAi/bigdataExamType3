@@ -82,36 +82,24 @@ df = pd.DataFrame({
 
 ## 📊 ANOVA + TukeyHSD 분석 단계
 
-### 1단계: 정규성 검정 (각 그룹별)
-```python
-from scipy.stats import shapiro
+**참고:** 정규성 검정(Shapiro-Wilk)은 별도 노드에서 다루므로, ANOVA 문제에서는 정규성을 만족한다고 가정하고 진행합니다.
 
+### 1단계: 그룹 분리
+```python
 영업 = df[df['부서'] == '영업']['월급여']
 기획 = df[df['부서'] == '기획']['월급여']
 개발 = df[df['부서'] == '개발']['월급여']
-
-_, p_영업 = shapiro(영업)
-_, p_기획 = shapiro(기획)
-_, p_개발 = shapiro(개발)
 ```
 
-### 2단계: 검정 방법 선택
-```
-모든 그룹 정규성 만족 (p > 0.05) → f_oneway (ANOVA)
-하나라도 불만족 (p ≤ 0.05) → kruskal (Kruskal-Wallis)
-```
-
-### 3단계: 일원분산분석 수행
+### 2단계: 일원분산분석 수행
 ```python
-from scipy.stats import f_oneway, kruskal
+from scipy.stats import f_oneway
 
-if all([p_영업 > 0.05, p_기획 > 0.05, p_개발 > 0.05]):
-    stat, pval = f_oneway(영업, 기획, 개발)
-else:
-    stat, pval = kruskal(영업, 기획, 개발)
+# 정규성을 만족한다고 가정
+stat, pval = f_oneway(영업, 기획, 개발)
 ```
 
-### 4단계: TukeyHSD 사후검정 (정규성 만족 시만)
+### 3단계: TukeyHSD 사후검정
 ```python
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
@@ -139,13 +127,12 @@ tukey_df = pd.DataFrame(
 
 Q1. '영업' 부서의 월급여 평균을 소수점 2자리까지 구하시오. (출력: 소수점 2자리)
 Q2. '기획' 부서의 월급여 표준편차를 소수점 2자리까지 구하시오. (출력: 소수점 2자리)
-Q3. '영업' 부서의 Shapiro-Wilk 검정 p-value를 구하시오. (출력: 소수점 4자리)
-Q4. '기획' 부서의 Shapiro-Wilk 검정 p-value를 구하시오. (출력: 소수점 4자리)
-Q5. '개발' 부서의 Shapiro-Wilk 검정 p-value를 구하시오. (출력: 소수점 4자리)
-Q6. 적절한 일원분산분석을 수행하고 검정통계량을 구하시오. (출력: 소수점 3자리)
-Q7. 일원분산분석의 p-value를 구하시오. (출력: 소수점 4자리)
-Q8. 정규성을 만족하는 경우 TukeyHSD 사후검정을 수행하고, '영업'-'기획' 그룹 간 유의한 차이가 있는지 판단하시오. (출력: "있다" 또는 "없다")
+Q3. 일원분산분석(f_oneway)을 수행하고 검정통계량을 구하시오. (출력: 소수점 3자리)
+Q4. 일원분산분석의 p-value를 구하시오. (출력: 소수점 4자리)
+Q5. TukeyHSD 사후검정을 수행하고, '영업'-'기획' 그룹 간 유의한 차이가 있는지 판단하시오. (출력: "있다" 또는 "없다")
 ```
+
+**참고:** 정규성 검정(Shapiro-Wilk)은 별도 노드에서 다루므로, ANOVA 문제에서는 제외합니다.
 
 ---
 
@@ -156,22 +143,21 @@ Q8. 정규성을 만족하는 경우 TukeyHSD 사후검정을 수행하고, '영
 
 ### 필요한 라이브러리
 - pandas, numpy
-- scipy.stats: shapiro, f_oneway, kruskal
+- scipy.stats: f_oneway
 - statsmodels.stats.multicomp: pairwise_tukeyhsd
 
 ### 주요 함수
 1. 그룹 분리: `df[df['그룹'] == '그룹A']['값']`
-2. 정규성 검정: `shapiro(데이터)` → p > 0.05면 정규분포
-3. ANOVA: `f_oneway(그룹A, 그룹B, 그룹C)`
-4. Kruskal-Wallis: `kruskal(그룹A, 그룹B, 그룹C)`
-5. TukeyHSD: `pairwise_tukeyhsd(df['값'], df['그룹'], alpha=0.05)`
-6. DataFrame 변환: `pd.DataFrame(data=tukey.summary().data[1:], columns=tukey.summary().data[0])`
+2. ANOVA: `f_oneway(그룹A, 그룹B, 그룹C)`
+3. TukeyHSD: `pairwise_tukeyhsd(df['값'], df['그룹'], alpha=0.05)`
+4. DataFrame 변환: `pd.DataFrame(data=tukey.summary().data[1:], columns=tukey.summary().data[0])`
 
 ### 흔한 실수
 ❌ 그룹당 샘플 수가 10개 미만
-❌ 정규성 불만족인데 ANOVA 사용
 ❌ TukeyHSD에 raw data 대신 그룹별 데이터 입력
 ❌ TukeyHSD 결과에서 reject 열 확인 안 함
+
+**참고:** 정규성 검정(Shapiro-Wilk)은 별도 노드에서 다루므로 제외합니다.
 ```
 
 ---
@@ -182,8 +168,7 @@ Q8. 정규성을 만족하는 경우 TukeyHSD 사후검정을 수행하고, '영
 
 ```python
 import pandas as pd
-import numpy as np
-from scipy.stats import shapiro, f_oneway, kruskal
+from scipy.stats import f_oneway
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
 # 데이터 생성
@@ -204,39 +189,28 @@ df = pd.DataFrame({
 print(round(영업.mean(), 2))
 print(round(기획.std(), 2))
 
-# Q3-Q5: 정규성 검정
-_, p_영업 = shapiro(영업)
-_, p_기획 = shapiro(기획)
-_, p_개발 = shapiro(개발)
-print(round(p_영업, 4))
-print(round(p_기획, 4))
-print(round(p_개발, 4))
-
-# Q6-Q7: 일원분산분석
-if all([p_영업 > 0.05, p_기획 > 0.05, p_개발 > 0.05]):
-    stat, pval = f_oneway(영업, 기획, 개발)
-else:
-    stat, pval = kruskal(영업, 기획, 개발)
-
+# Q3-Q4: 일원분산분석
+stat, pval = f_oneway(영업, 기획, 개발)
 print(round(stat, 3))
 print(round(pval, 4))
 
-# Q8: TukeyHSD 사후검정 (정규성 만족 시만)
-if all([p_영업 > 0.05, p_기획 > 0.05, p_개발 > 0.05]):
-    tukey = pairwise_tukeyhsd(df['월급여'], df['부서'], alpha=0.05)
-    tukey_df = pd.DataFrame(
-        data=tukey.summary().data[1:],
-        columns=tukey.summary().data[0]
-    )
+# Q5: TukeyHSD 사후검정
+tukey = pairwise_tukeyhsd(df['월급여'], df['부서'], alpha=0.05)
+tukey_df = pd.DataFrame(
+    data=tukey.summary().data[1:],
+    columns=tukey.summary().data[0]
+)
 
-    # '영업'-'기획' 쌍 찾기
-    pair = tukey_df[
-        ((tukey_df['group1'] == '영업') & (tukey_df['group2'] == '기획')) |
-        ((tukey_df['group1'] == '기획') & (tukey_df['group2'] == '영업'))
-    ]
+# '영업'-'기획' 쌍 찾기
+pair = tukey_df[
+    ((tukey_df['group1'] == '영업') & (tukey_df['group2'] == '기획')) |
+    ((tukey_df['group1'] == '기획') & (tukey_df['group2'] == '영업'))
+]
 
-    print("있다" if pair['reject'].values[0] else "없다")
+print("있다" if pair['reject'].values[0] else "없다")
 ```
+
+**참고:** 정규성을 만족한다고 가정하고 f_oneway와 TukeyHSD를 바로 수행합니다.
 
 ---
 
