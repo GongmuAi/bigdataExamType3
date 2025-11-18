@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { NodeData } from '@/types/mindmap';
 
 const ConditionNode = ({ data }: NodeProps) => {
-  const nodeData = data as NodeData;
+  const nodeData = data as unknown as NodeData;
 
   return (
     <div className="min-w-[260px]">

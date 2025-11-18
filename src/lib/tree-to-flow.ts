@@ -32,8 +32,6 @@ export function convertTreeToFlow(tree: StatNode): { nodes: Node[]; edges: Edge[
           strokeWidth: 2.5,
           strokeOpacity: 0.8,
         },
-        // 엣지 간격 개선을 위한 pathOptions 추가
-        pathOptions: { offset: 5, borderRadius: 10 },
       });
     }
 

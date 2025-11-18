@@ -28,7 +28,7 @@ const StatMethodNode = ({ data, id }: NodeProps) => {
   const [practiceQuestion, setPracticeQuestion] = useState('');
   const [parsedQuestion, setParsedQuestion] = useState<ParsedQuestion | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const nodeData = data as NodeData;
+  const nodeData = data as unknown as NodeData;
 
   const code = sampleCodes[id] || '';
 

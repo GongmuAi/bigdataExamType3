@@ -23,4 +23,5 @@ export interface NodeData {
     functionName: string;
   };
   isExpanded?: boolean;
+  [key: string]: unknown;
 }
